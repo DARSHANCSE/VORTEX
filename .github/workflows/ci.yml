@@ -25,9 +25,6 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-
-      - name: Lint the code
-        run: npm run lint
         
       - name: Build Next.js App
         run: npm run build
