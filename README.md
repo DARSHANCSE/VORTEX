@@ -1,45 +1,35 @@
-# GHOST - GitHub Operations & Scaffolding Tool
+### *STACKD*  
+Scaffolding Tool for Accelerated Code Kickstart & Deployment  
 
-## What is GHOST?
-GHOST (GitHub Operations & Scaffolding Tool) is a powerful tool designed to streamline Git operations while providing an advanced *project scaffolding* system. With GHOST, developers can create fully configured projects in just a few clicks, run CI/CD workflows locally, and manage repositories efficiently through a graphical UI.
+## What is STACKD?  
+STACKD is a CLI-based scaffolding tool that helps developers instantly set up a full-stack application with customizable configurations. It allows you to define your project name, frontend and backend ports, preferred tech stack, database, ORM, and authentication method. With a single command, STACKD generates a production-ready project with authentication and deployment configurations pre-integrated.  
 
-## Table of Contents
-- Motivation
-- Features
-- Installation
-- Usage
-- License
+## Motivation  
+Setting up a full-stack project can be tedious and repetitive. Choosing the right frameworks, setting up authentication, configuring databases, and managing deployment files takes time. STACKD aims to simplify this process by providing a boilerplate generator that caters to every possible stack, making it easier for developers to jump straight into development.  
 
-## Motivation
-Managing Git repositories via the command line can be complex and time-consuming, and existing GUI tools are often locked behind paywalls. Additionally, setting up new projects from scratch can be tedious and error-prone. GHOST eliminates these barriers by combining a user-friendly Git interface with an intuitive *scaffolding system* for rapid project initialization.
+## ✨ Features  
+✅ *Full-stack Ready* – Generates a complete project structure with frontend and backend setup.  
+✅ *Customizable* – Choose your preferred frontend framework (React, Next.js, Vue, Svelte), backend (Express, NestJS, Fastify, Django), database (PostgreSQL, MySQL, MongoDB), and ORM (Prisma, TypeORM, Sequelize).  
+✅ *Built-in Authentication* – Supports NextAuth.js, Passport.js, Auth.js, Firebase Auth, and more.  
+✅ *Pre-configured Deployment* – Includes a vercel.json file for Express deployments, along with Docker support.  
+✅ *One-command Setup* – Instantly bootstraps a project with all selected configurations.  
+✅ *Extensible* – Open-source and flexible to accommodate additional integrations.  
 
-## Features
-- *Graphical Git Interface*: Push, commit, merge branches, and create pull requests seamlessly.
-- *Project Scaffolding (ScaffFolder)*: Quickly generate projects by selecting a frontend, backend, ORM, and database—eliminating the hassle of manual setup.
-- *Local CI/CD Execution*: Fetch workflows from repositories and execute them locally with results displayed in real-time.
-- *Personal GitHub Tracker*: Monitor repository activity, track contributions, and manage branches efficiently.
-- *Redis Volume Mounts Caching*: Accelerates Git operations by caching local repositories and Git logs for improved performance.
-
-## Installation
-### Prerequisites
-Ensure you have the following installed:
-- Docker
-- Git
-
-### Setup
-Run the following command to start GHOST:
+## 🛠 Installation  
 sh
- docker run ghost-tool
+npm install -g stackd-cli
+  
 
+## Usage  
+1. Run the CLI:  
+   sh
+   stackd create my-project
+     
+2. Select the frontend, backend, database, ORM, and authentication method.  
+3. STACKD will generate a ready-to-use full-stack project.  
+4. Navigate into the project directory and start coding!  
 
-## Usage
-- *Project Scaffolding*: Use ScaffFolder to create fully configured projects in seconds—just choose your tech stack, and GHOST sets everything up.
-- *Manage Repositories*: Utilize the graphical interface to push, commit, merge, and track changes.
-- *Run Workflows*: Execute CI/CD workflows locally without needing to push changes to GitHub.
-- *Monitor Git Logs*: View repository activity with Redis-based caching for optimized performance.
-
-## License
-This project is licensed under the MIT License. You are free to use, modify, and distribute this software under the terms of the MIT LICENSE.
+## 📜 License  
+This project is licensed under the MIT License.  
 
 ---
-GHOST is an *open-source alternative to GitKraken, aimed at **simplifying Git operations and accelerating project setup*. Contributions are welcome!

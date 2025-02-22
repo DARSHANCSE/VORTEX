@@ -1,151 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { mkdir, writeFile } from 'fs/promises'
-import { join } from 'path'
-import { execSync } from 'child_process'
+import { mkdir, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
+import { execSync } from 'node:child_process'
+import { createReactTS } from '@/app/scripts/frontend/reactts'
+import { createReactJS } from '@/app/scripts/frontend/reactjs'
+import { createExpressTS } from '@/app/scripts/backend/expressts'
+import { createExpressJS } from '@/app/scripts/backend/expressjs'
 
 export async function POST(req: NextRequest) {
     try {
         const config = await req.json()
         const projectDir = join(config.projectPath, config.projectName)
-        
-        // Create project directory
+
         await mkdir(projectDir, { recursive: true })
-
-        // Initialize frontend with Vite
-        console.log('Initializing frontend...')
-        execSync(`npm create vite@latest frontend -- --template ${config.frontend}`, {
-            cwd: projectDir,
-            stdio: 'inherit'
-        })
-
-        // Update frontend vite config with custom port
-        const viteConfig = `
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-
-export default defineConfig({
-    plugins: [react()],
-    server: {
-        port: ${config.frontendPort},
-        proxy: {
-            '/api': {
-                target: 'http://localhost:${config.backendPort}',
-                changeOrigin: true
-            }
-        }
-    }
-})`
-
-        await writeFile(
-            join(projectDir, 'frontend', 'vite.config.ts'),
-            viteConfig.trim()
-        )
-
-        // Initialize backend
-        console.log('Initializing backend...')
-        await mkdir(join(projectDir, 'backend'))
         
-        // Create backend package.json
-        const backendPackageJson = {
-            name: "backend",
-            version: "1.0.0",
-            scripts: {
-                "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-                "build": "tsc",
-                "start": "node dist/index.js"
-            },
-            dependencies: {
-                "express": "^4.18.2",
-                "cors": "^2.8.5",
-                "dotenv": "^16.3.1"
-            },
-            devDependencies: {
-                "@types/express": "^4.17.17",
-                "@types/cors": "^2.8.13",
-                "@types/node": "^20.4.5",
-                "typescript": "^5.1.6",
-                "ts-node-dev": "^2.0.0"
-            }
+        // Select and create frontend based on config
+        switch(config.frontend) {
+            case 'react-ts':
+                await createReactTS(config, projectDir)
+                break
+            case 'react':
+                await createReactJS(config, projectDir)
+                break
+            default:
+                throw new Error(`Unsupported frontend: ${config.frontend}`)
         }
 
-        await writeFile(
-            join(projectDir, 'backend', 'package.json'),
-            JSON.stringify(backendPackageJson, null, 2)
-        )
-
-        // Create backend tsconfig.json
-        const tsConfig = {
-            compilerOptions: {
-                "target": "ES2020",
-                "module": "CommonJS",
-                "lib": ["ES2020"],
-                "moduleResolution": "node",
-                "outDir": "./dist",
-                "rootDir": "./src",
-                "strict": true,
-                "esModuleInterop": true,
-                "skipLibCheck": true,
-                "forceConsistentCasingInFileNames": true,
-                "resolveJsonModule": true
-            },
-            include: ["src/**/*"],
-            exclude: ["node_modules"]
+        // Select and create backend based on config
+        switch(config.backend) {
+            case 'express-ts':
+                await createExpressTS(config, projectDir)
+                break
+            case 'express':
+                await createExpressJS(config, projectDir)
+                break
+            default:
+                throw new Error(`Unsupported backend: ${config.backend}`)
         }
 
-        await writeFile(
-            join(projectDir, 'backend', 'tsconfig.json'),
-            JSON.stringify(tsConfig, null, 2)
-        )
-
-        // Create backend source directory and files
-        await mkdir(join(projectDir, 'backend', 'src'))
-
-        // Create backend index.ts
-        const backendIndex = `
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-
-dotenv.config();
-
-const app = express();
-const port = process.env.PORT || ${config.backendPort};
-
-app.use(cors());
-app.use(express.json());
-
-// Test route
-app.get('/api/test', (req, res) => {
-    res.json({ message: 'Hello from Express!' });
-});
-
-// Health check route
-app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date() });
-});
-
-app.listen(port, () => {
-    console.log(\`Server running on port \${port}\`);
-});`
-
-        await writeFile(
-            join(projectDir, 'backend', 'src', 'index.ts'),
-            backendIndex.trim()
-        )
-
-        // Create backend .env
-        const envFile = `
-PORT=${config.backendPort}
-NODE_ENV=development
-# Add your environment variables here
-`
-
-        await writeFile(
-            join(projectDir, 'backend', '.env'),
-            envFile.trim()
-        )
-
-        // Create root package.json for project management
+        // Create root package.json
         const rootPackageJson = {
             name: config.projectName,
             version: '1.0.0',
@@ -262,6 +155,10 @@ Thumbs.db
         console.log('Installing dependencies...')
         execSync('npm install', { cwd: projectDir, stdio: 'inherit' })
         execSync('npm run install:all', { cwd: projectDir, stdio: 'inherit' })
+
+        // Start the servers
+        console.log('Starting servers...')
+        execSync('npm run dev', { cwd: projectDir, stdio: 'inherit' })
 
         return NextResponse.json({
             success: true,
